@@ -1,0 +1,2 @@
+# osu-collections-downloader
+ 
