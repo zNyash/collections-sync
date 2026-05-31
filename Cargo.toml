@@ -4,24 +4,4 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-anyhow = "1.0.102"
-chrono = "0.4.44"
-clap = "4.6.1"
-directories = "6.0.0"
-inquire = "0.9.4"
-rosu-v2 = "0.11.0"
-serde = "1.0.228"
-serde_json = "1.0.150"
-tokio = { version = "1.52.3", features = ["full"] }
-tracing = "0.1.44"
-tracing-subscriber = "0.3.23"
 rosu-db = { path = "./rosu-db" }
-indicatif = "0.18.4"
-tracing-indicatif = "0.3.14"
-governor = { version = "0.8", features = ["std"] }
-nonzero_ext = "0.3"
-reqwest = { version = "0.12", features = [
-  "json",
-  "rustls-tls",
-], default-features = false }
-bytes = "1.11.1"
