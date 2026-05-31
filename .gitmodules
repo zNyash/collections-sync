@@ -1,0 +1,3 @@
+[submodule "rosu-db"]
+	path = rosu-db
+	url = https://github.com/zNyash/rosu-db.git
