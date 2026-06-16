@@ -14,4 +14,5 @@ rosu-db = { path = "./rosu-db" }
 rosu-v2 = "0.11.0"
 serde = "1.0.228"
 serde_json = "1.0.150"
+shellexpand = "3.1.2"
 tokio = { version = "1.52.3", features = ["full"] }
