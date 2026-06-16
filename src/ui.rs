@@ -1,6 +1,7 @@
 // src/ui.rs
 use indicatif::MultiProgress;
 
+#[allow(dead_code)]
 pub fn info(mp: &MultiProgress, msg: &str) {
     mp.println(format!("\x1b[32m[Info]\x1b[0m {}", msg))
         .unwrap();

@@ -4,7 +4,7 @@ use rosu_db::{parse_collection_db, parse_osu_db};
 use std::collections::HashSet;
 use std::path::Path;
 
-pub fn get_missing_hashes(osu_path: &Path) -> Result<Vec<String>> {
+pub fn get_missing_hashes(osu_path: &Path) -> Result<HashSet<String>> {
     let osu_db = parse_osu_db(&osu_path.join("osu!.db"))?;
     let collection_db = parse_collection_db(&osu_path.join("collection.db"))?;
 
@@ -16,7 +16,7 @@ pub fn get_missing_hashes(osu_path: &Path) -> Result<Vec<String>> {
         .collect();
 
     // all md5s referenced in your collections, minus the ones already installed
-    let missing: Vec<String> = collection_db
+    let missing: HashSet<String> = collection_db
         .collections
         .iter()
         .flat_map(|c| c.beatmap_md5s.iter())

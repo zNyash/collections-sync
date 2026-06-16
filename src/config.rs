@@ -12,7 +12,6 @@ pub struct Config {
 }
 
 impl Config {
-    // load config
     pub fn load() -> anyhow::Result<Self> {
         let config_path = Self::config_path()?;
 
