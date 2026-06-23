@@ -3,6 +3,7 @@ use std::{collections::HashSet, num::NonZeroU32, sync::Arc};
 use anyhow::Result;
 use futures::{StreamExt, stream};
 use governor::{Quota, RateLimiter};
+use indicatif::{ProgressBar, ProgressStyle};
 use rosu_v2::Osu;
 
 const MAX_CONCURRENT: usize = 15;
@@ -16,36 +17,36 @@ pub async fn fetch_beatmaps_by_md5s(
         NonZeroU32::new(REQUESTS_PER_MINUTE).unwrap(),
     )));
 
-    let results: Vec<_> = stream::iter(md5s_list.iter())
+    let bar = ProgressBar::new(md5s_list.len() as u64);
+    bar.set_style(
+        ProgressStyle::with_template(
+            "{msg}\n[{elapsed_precise}] [{bar:40.cyan/blue}] {pos}/{len} ({eta})",
+        )
+        .unwrap()
+        .progress_chars("=>-"),
+    );
+    bar.set_message("Fetching beatmap IDs...");
+
+    let mapset_ids: HashSet<u32> = stream::iter(md5s_list.iter())
         .map(|md5| {
-            // let osu = osu.clone();
             let limiter = Arc::clone(&limiter);
+            let bar = bar.clone();
+
             async move {
                 limiter.until_ready().await;
-                osu.beatmap().checksum(md5).await
+                let result = osu.beatmap().checksum(md5).await;
+                bar.inc(1);
+                result.ok().map(|b| b.mapset_id)
             }
         })
         .buffer_unordered(MAX_CONCURRENT)
-        .collect()
-        .await;
-
-    let mut errors = Vec::new();
-
-    let beatmaps: Vec<_> = results
+        .collect::<Vec<_>>()
+        .await
         .into_iter()
-        .filter_map(|r| match r {
-            Ok(beatmap) => {
-                println!("Got beamapset: {}", beatmap.mapset_id);
-                Some(beatmap)
-            }
-            Err(e) => {
-                errors.push(e);
-                None
-            }
-        })
+        .flatten()
         .collect();
 
-    let mapset_ids: HashSet<u32> = beatmaps.iter().map(|beatmap| beatmap.mapset_id).collect();
+    bar.finish_with_message(format!("Fetched {} beatmpa sets.", mapset_ids.len()));
 
     Ok(mapset_ids)
 }
