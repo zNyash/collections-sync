@@ -1,12 +1,13 @@
 mod config;
 mod db;
+mod download;
 mod fetch;
 mod ui;
 
 use config::Config;
 use rosu_v2::Osu;
 
-use crate::fetch::fetch_beatmaps_by_md5s;
+use crate::{download::download_beatmaps_by_ids, fetch::fetch_beatmaps_by_md5s};
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
@@ -23,7 +24,9 @@ async fn main() -> anyhow::Result<()> {
         missing_beatmaps.len()
     );
 
-    let _mapset_ids = fetch_beatmaps_by_md5s(&osu, &missing_beatmaps).await?;
+    let mapset_ids = fetch_beatmaps_by_md5s(&osu, &missing_beatmaps).await?;
+
+    download_beatmaps_by_ids(&mapset_ids).await;
 
     Ok(())
 }
